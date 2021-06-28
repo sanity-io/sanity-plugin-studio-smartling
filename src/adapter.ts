@@ -1,42 +1,43 @@
-import { Secrets, Adapter } from 'sanity-translations-tab'
+import { Secrets, Adapter } from 'sanity-translations-tab-cg'
 const serverlessSmartling = 'http://localhost:3000/api'
 
-const getLocales = (secrets: Secrets) => (
+const getLocales = (secrets: Secrets) =>
   fetch(`${serverlessSmartling}/getLocales`)
     .then(res => res.json())
     .then(res => res.locales)
-)
 
-const getTranslationTask = (documentId: string, secrets: Secrets) => (
-  fetch(`${serverlessSmartling}/getTranslationTask?documentId=${documentId}`)
-    .then(res => res.json())
-)
+const getTranslationTask = (documentId: string, secrets: Secrets) =>
+  fetch(
+    `${serverlessSmartling}/getTranslationTask?documentId=${documentId}`
+  ).then(res => res.json())
 
 const createTask = async (
   documentId: string,
   document: Record<string, any>,
   localeIds: string[],
-  secrets: Secrets) => {
+  secrets: Secrets
+) => {
   return fetch(`${serverlessSmartling}/createTask`, {
     method: 'POST',
     body: JSON.stringify({
       documentId,
       document,
       localeIds,
-      secrets })
-    })
-    .then(res => getTranslationTask(documentId, secrets))
+      secrets,
+    }),
+  }).then(res => getTranslationTask(documentId, secrets))
 }
 
-const getTranslation = (taskId: string, localeId: string, secrets: Secrets) => (
-  fetch(`${serverlessSmartling}/getTranslation?taskId=${taskId}&localeId=${localeId}`)
+const getTranslation = (taskId: string, localeId: string, secrets: Secrets) =>
+  fetch(
+    `${serverlessSmartling}/getTranslation?taskId=${taskId}&localeId=${localeId}`
+  )
     .then(res => res.json())
-)
+    .then(res => res.body)
 
 export const SmartlingAdapter: Adapter = {
   getLocales,
   getTranslationTask,
   createTask,
-  getTranslation
+  getTranslation,
 }
-

@@ -1,4 +1,4 @@
-import { TranslationsTab } from 'sanity-translations-tab'
+import { TranslationsTab } from 'sanity-translations-tab-cg'
 import {
   BaseDocumentDeserializer,
   BaseDocumentSerializer,
@@ -25,7 +25,7 @@ const defaultDocumentLevelConfig = {
       BaseDocumentPatcher.documentLevelPatch(deserialized, id, localeId)
     )
   },
-  adapter: SmartlingAdapter
+  adapter: SmartlingAdapter,
 }
 
 const defaultFieldLevelConfig = {
@@ -57,5 +57,5 @@ export {
   customSerializers,
   SmartlingAdapter,
   defaultDocumentLevelConfig,
-  defaultFieldLevelConfig
+  defaultFieldLevelConfig,
 }
