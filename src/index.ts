@@ -1,4 +1,4 @@
-import { TranslationsTab } from 'sanity-translations-tab-cg'
+import { TranslationsTab } from 'sanity-translations-tab'
 import {
   BaseDocumentDeserializer,
   BaseDocumentSerializer,
