@@ -10,19 +10,11 @@ export const getTranslation = async (
   const accessToken = await authenticate(secrets.secret)
   const translatedHTML = await fetch(smartlingProxy, {
     method: 'POST',
-    headers: getHeaders(url, accessToken),
+    headers: getHeaders(url, accessToken)
   })
-  .then(res => {
-    const chunks = []
-    //@ts-ignore
-    res.body.on('data', chunk => chunks.push(chunk)) 
-    return new Promise(resolve => {
-      //@ts-ignore
-      res.body.on('end', () => {
-          return resolve(Buffer.concat(chunks).toString())
-	})
-      })
-    }) 
+  .then(res => res.json())
+  .then(res => res.body)
 
-    return translatedHTML
+  return translatedHTML
+
 }

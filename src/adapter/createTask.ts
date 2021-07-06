@@ -1,4 +1,4 @@
-import { smartlingProxy, authenticate, getHeaders } from './helpers'
+import { smartlingProxy, authenticate, getHeaders, findExistingJob } from './helpers'
 import { Secrets } from 'sanity-translations-tab-cg'
 import { getTranslationTask } from './getTranslationTask'
 
@@ -15,31 +15,12 @@ const uploadFile = async (
   const htmlBuffer = Buffer.from(document.content, 'utf-8')
   formData.append('file', new Blob([htmlBuffer]), `${document.name}.html`)
 
-  fetch(smartlingProxy, {
+  return fetch(smartlingProxy, {
     method: 'POST',
     headers: getHeaders(url, accessToken),
     body: formData
   })
-}
-
-const findExistingJob = async (
-  documentId: string,
-  projectId: string,
-  accessToken: string): 
-    Promise<string> => {
-  const url = `https://api.smartling.com/jobs-api/v3/projects/${projectId}/jobs?jobName=${documentId}` 
-  return fetch(smartlingProxy, {
-    method: 'POST',
-    headers: getHeaders(url, accessToken)
-  })
   .then(res => res.json())
-  .then(res => {
-    if (res.response.data.items.length) {
-      return res.response.data.items[0].translationJobUid
-      } else {
-        return ''
-      }
-  })
 }
 
 const assignFileToJob = async (
@@ -51,14 +32,14 @@ const assignFileToJob = async (
   const url = `https://api.smartling.com/jobs-api/v3/projects/${projectId}/jobs/${jobId}/file/add`
   return fetch(smartlingProxy, {
     method: 'POST',
-    headers: getHeaders(url, accessToken),
+    headers: {...getHeaders(url, accessToken), 'content-type': 'application/json'},
     body: JSON.stringify({
       fileUri: documentId,
       targetLocaleIds: localeIds
     })
   })
   .then(res => res.json())
-  .then(res => res.response.data)
+  .then(res => res.response)
 }
 
 const createJob = async (
@@ -69,12 +50,11 @@ const createJob = async (
    const url = `https://api.smartling.com/jobs-api/v3/projects/${projectId}/jobs`
    return fetch(smartlingProxy, {
        method: 'POST',
-       headers: getHeaders(url, accessToken),
-	body: JSON.stringify({
-	    jobName: documentId,
-	    targetLocaleIds: localeIds
-	})
-       
+       headers: {...getHeaders(url, accessToken), 'content-type': 'application/json'},
+       body: JSON.stringify({
+         jobName: documentId,
+         targetLocaleIds: localeIds
+      })
    })
     .then(res => res.json())
     .then(res => res.response.data.translationJobUid)
@@ -88,7 +68,7 @@ const authorizeJob = async (
   const url = `https://api.smartling.com/jobs-api/v3/projects/${projectId}/jobs/${jobId}/authorize`
   return fetch(smartlingProxy, {
     method: 'POST',
-    headers: getHeaders(url, accessToken),
+    headers: {...getHeaders(url, accessToken), 'content-type': 'application/json'},
     body: JSON.stringify({
       localeWorkflows: localeIds.map(l => ({targetLocaleId: l}))
     })
@@ -104,17 +84,21 @@ export const createTask = async (
   secrets: Secrets
 ) => {
   const accessToken = await authenticate(secrets.secret)
-  await uploadFile(documentId, secrets.project, document, accessToken)
+  //TODO: announce errors here
+  const uploadFileRes = await uploadFile(documentId, secrets.project, document, accessToken)
+  console.log('uploadFileRes', uploadFileRes)
   let taskId = await findExistingJob(documentId, secrets.project, accessToken)
   if (!taskId) {
     taskId = await createJob(documentId, secrets.project, localeIds, accessToken)
-  }
+  } 
 
   //TODO: log errors here if needed
   const assignStatus = await assignFileToJob(
 	  taskId, documentId, secrets.project, localeIds, accessToken)
+  console.log('assign status', assignStatus)
   const authorizeStatus = await authorizeJob(
 	  taskId, secrets.project, localeIds, accessToken)
+  console.log('authStatus', authorizeStatus)
 
    return getTranslationTask(documentId, secrets)
 }
