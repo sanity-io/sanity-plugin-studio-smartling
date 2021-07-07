@@ -1,4 +1,4 @@
-import { Adapter } from 'sanity-translations-tab-cg'
+import { Adapter } from 'sanity-translations-tab'
 import { getLocales } from './getLocales'
 import { getTranslationTask } from './getTranslationTask'
 import { createTask } from './createTask'
