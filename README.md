@@ -1,6 +1,9 @@
 
 # Studio Plugin for Sanity & Smartling
 
+![smartling gif](https://user-images.githubusercontent.com/3969996/125689321-bf37021f-ba55-4147-83eb-1745eb8acb1f.gif)
+
+
 We're proud to be partnered with Smartling and their [official connector](https://help.smartling.com/hc/en-us/articles/1260803085050-Sanity-Connector-Overview-) makes it quick and easy to get your studio content into your Smartling project.
 
 This is a separate plugin, and differs in that it provides editors a visual progress bar for ongoing translations and a way to import translations back into your content at either the document or field level. Feel free to try it out and see which solution works for you!
