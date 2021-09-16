@@ -22,7 +22,7 @@ This plugin comes with (and exposes to the developer) the following items:
 - A `Serializer` that transforms your content into HTML (we found this was the most efficient way to maintain your document structure, no matter how deeply nested, while remaining readable to translators in Smartling). The `Serializer` takes in optional arguments: `stopTypes`, which prevents certain types from being sent to your translatiors and `customSerializers`, which are rules you can use to have full control over how individual fields on your document get serialized.
 - A `Deserializer` that deserializes translated text back to Sanity's format.
 - A `Patcher` which determines how your content gets patched back into its destination document or field.
-- A `TranslationTab`, a React element that allows a non-technical user to import, export, and monitor Smartling progress.
+- A `TranslationsTab`, a React element that allows a non-technical user to import, export, and monitor Smartling progress.
 
 To make life easier, we also include `defaultFieldLevelConfig` and `defaultDocumentLevelConfig`, which bundles all of the above up to get you up and running quickly. 
 
@@ -88,7 +88,7 @@ secret: 'YOUR_TOKEN_SECRET_HERE',
 ```javascript
 import S from '@sanity/desk-tool/structure-builder'
 //...your other desk structure imports...
-import { TranslationTab, defaultDocumentLevelConfig } from 'sanity-plugin-studio-smartling'
+import { TranslationsTab, defaultDocumentLevelConfig } from 'sanity-plugin-studio-smartling'
 
 
 export const getDefaultDocumentNode = (props) => {
@@ -96,7 +96,7 @@ export const getDefaultDocumentNode = (props) => {
     return S.document().views([
       S.view.form(),
       //...my other views -- for example, live preview, the i18n plugin, etc.,
-      S.view.component(TranslationTab).title('Smartling').options(
+      S.view.component(TranslationsTab).title('Smartling').options(
         defaultDocumentLevelConfig  
       )
     ])
@@ -108,11 +108,11 @@ export const getDefaultDocumentNode = (props) => {
 And that should do it! 
 
 ## Studio experience
-By adding the `TranslationTab` to your desk structure, your users should now have an additional view. The boxes at the top of the tab can be used to send translations off to Smartling, and once those jobs are started, they should see progress bars monitoring the progress of the jobs. They can import a partial or complete job back.
+By adding the `TranslationsTab` to your desk structure, your users should now have an additional view. The boxes at the top of the tab can be used to send translations off to Smartling, and once those jobs are started, they should see progress bars monitoring the progress of the jobs. They can import a partial or complete job back.
 
 ## Overriding defaults
 
-To personalize this configuration it's useful to know what arguments go into `TranslationTab` as options (the `defaultConfigs` are just wrappers for these):
+To personalize this configuration it's useful to know what arguments go into `TranslationsTab` as options (the `defaultConfigs` are just wrappers for these):
   * `exportForTranslation`: a function that takes your document id and returns an object with `name`: the field you want to use identify your doc in Smartling (by default this is `_id` and `content`: a serialized HTML string of all the fields in your document to be translated.
   * `importTranslation`: a function that takes in `id` (your document id) `localeId` (the locale of the imported language) and `document` the translated HTML from Smartling. It will deserialize your document back into an object that can be patched into your Sanity data, and then executes that patch.
   * `Adapter`: An interface with methods to send things over to Smartling. You likely don't want to override this!
