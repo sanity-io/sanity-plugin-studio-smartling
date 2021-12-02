@@ -32,7 +32,7 @@ export const getTranslationTask = async (
   if (smartlingTask && smartlingTask.contentProgressReport) {
     locales = smartlingTask.contentProgressReport.map(item => ({
       localeId: item.targetLocaleId,
-      progress: item.progress.percentComplete,
+      progress: item.progress ? item.progress.percentComplete : 0,
     }))
   }
 

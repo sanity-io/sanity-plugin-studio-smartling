@@ -2,7 +2,7 @@ import { SanityDocument } from '@sanity/types'
 import sanityClient from 'part:@sanity/base/client'
 import { BaseDocumentMerger } from 'sanity-naive-html-serializer'
 
-const client = sanityClient.withConfig({ apiVersion: 'v1' })
+const client = sanityClient.withConfig({ apiVersion: '2021-03-25' })
 
 //document fetch
 export const findLatestDraft = (documentId: string, ignoreI18n = true) => {
@@ -33,7 +33,7 @@ export const findDocumentAtRevision = async (
   /* endpoint will silently give you incorrect doc
    * if you don't request draft and the rev belongs to a draft, so check
    */
-  if (revisionDoc._rev !== rev) {
+  if (!revisionDoc || revisionDoc._rev !== rev) {
     baseUrl = `/data/history/${dataset}/documents/drafts.${documentId}?revision=${rev}`
     url = client.getUrl(baseUrl)
     revisionDoc = await fetch(url, { credentials: 'include' })
@@ -67,7 +67,10 @@ export const documentLevelPatch = async (
     const cleanedMerge: Record<string, any> = {}
     //don't overwrite any existing values on the i18n doc
     Object.entries(merged).forEach(([key, value]) => {
-      if (Object.keys(translatedFields).includes(key)) {
+      if (
+        Object.keys(translatedFields).includes(key) &&
+        !['_id', '_rev', '_updatedAt'].includes(key)
+      ) {
         cleanedMerge[key] = value
       }
     })
