@@ -13,14 +13,16 @@ import { SanityDocument } from '@sanity/types/dist/dts'
 const defaultDocumentLevelConfig = {
   exportForTranslation: async (id: string) => {
     const doc = await findLatestDraft(id)
-    return BaseDocumentSerializer.serializeDocument(doc, 'document')
+    const serialized = BaseDocumentSerializer.serializeDocument(doc, 'document')
+    //needed for lookup by translation tab
+    serialized.name = id
+    return serialized
   },
   importTranslation: (id: string, localeId: string, document: string) => {
-    return BaseDocumentDeserializer.deserializeDocument(
+    const deserialized = BaseDocumentDeserializer.deserializeDocument(
       document
-    ).then((deserialized: SanityDocument) =>
-      documentLevelPatch(id, deserialized, localeId)
-    )
+    ) as SanityDocument
+    documentLevelPatch(id, deserialized, localeId)
   },
   adapter: SmartlingAdapter,
 }
@@ -28,14 +30,16 @@ const defaultDocumentLevelConfig = {
 const defaultFieldLevelConfig = {
   exportForTranslation: async (id: string) => {
     const doc = await findLatestDraft(id)
-    return BaseDocumentSerializer.serializeDocument(doc, 'field')
+    const serialized = BaseDocumentSerializer.serializeDocument(doc, 'field')
+    //needed for lookup by translation tab
+    serialized.name = id
+    return serialized
   },
   importTranslation: (id: string, localeId: string, document: string) => {
-    return BaseDocumentDeserializer.deserializeDocument(
+    const deserialized = BaseDocumentDeserializer.deserializeDocument(
       document
-    ).then((deserialized: SanityDocument) =>
-      fieldLevelPatch(id, deserialized, localeId)
-    )
+    ) as SanityDocument
+    fieldLevelPatch(id, deserialized, localeId)
   },
   adapter: SmartlingAdapter,
 }
