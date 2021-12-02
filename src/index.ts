@@ -2,47 +2,39 @@ import { TranslationsTab } from 'sanity-translations-tab'
 import {
   BaseDocumentDeserializer,
   BaseDocumentSerializer,
-  BaseDocumentPatcher,
+  BaseDocumentMerger,
   defaultStopTypes,
   customSerializers,
 } from 'sanity-naive-html-serializer'
 import { SmartlingAdapter } from './adapter'
+import { findLatestDraft, documentLevelPatch, fieldLevelPatch } from './helpers'
+import { SanityDocument } from '@sanity/types/dist/dts'
 
 const defaultDocumentLevelConfig = {
-  exportForTranslation: (id: string) =>
-    BaseDocumentSerializer.serializeDocument(
-      id,
-      'document',
-      'en',
-      defaultStopTypes,
-      customSerializers
-    ),
+  exportForTranslation: async (id: string) => {
+    const doc = await findLatestDraft(id)
+    return BaseDocumentSerializer.serializeDocument(doc, 'document')
+  },
   importTranslation: (id: string, localeId: string, document: string) => {
     return BaseDocumentDeserializer.deserializeDocument(
-      id,
       document
-    ).then((deserialized: Record<string, any>) =>
-      BaseDocumentPatcher.documentLevelPatch(deserialized, id, localeId)
+    ).then((deserialized: SanityDocument) =>
+      documentLevelPatch(id, deserialized, localeId)
     )
   },
   adapter: SmartlingAdapter,
 }
 
 const defaultFieldLevelConfig = {
-  exportForTranslation: (id: string) =>
-    BaseDocumentSerializer.serializeDocument(
-      id,
-      'field',
-      'en',
-      defaultStopTypes,
-      customSerializers
-    ),
+  exportForTranslation: async (id: string) => {
+    const doc = await findLatestDraft(id)
+    return BaseDocumentSerializer.serializeDocument(doc, 'field')
+  },
   importTranslation: (id: string, localeId: string, document: string) => {
     return BaseDocumentDeserializer.deserializeDocument(
-      id,
       document
-    ).then((deserialized: Record<string, any>) =>
-      BaseDocumentPatcher.fieldLevelPatch(deserialized, id, localeId, 'en')
+    ).then((deserialized: SanityDocument) =>
+      fieldLevelPatch(id, deserialized, localeId)
     )
   },
   adapter: SmartlingAdapter,
@@ -52,7 +44,7 @@ export {
   TranslationsTab,
   BaseDocumentDeserializer,
   BaseDocumentSerializer,
-  BaseDocumentPatcher,
+  BaseDocumentMerger,
   defaultStopTypes,
   customSerializers,
   SmartlingAdapter,
