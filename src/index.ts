@@ -8,7 +8,7 @@ import {
 } from 'sanity-naive-html-serializer'
 import { SmartlingAdapter } from './adapter'
 import { findLatestDraft, documentLevelPatch, fieldLevelPatch } from './helpers'
-import { SanityDocument } from '@sanity/types/dist/dts'
+import { SanityDocument } from '@sanity/types'
 
 const defaultDocumentLevelConfig = {
   exportForTranslation: async (id: string) => {
