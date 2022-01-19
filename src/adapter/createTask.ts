@@ -40,7 +40,7 @@ const createJobBatch = async (
   documentName: string,
   accessToken: string,
   localeIds: string[],
-  isWorkflowMT: boolean
+  workflowUid?: string
 ) => {
   const url = `https://api.smartling.com/job-batches-api/v2/projects/${projectId}/batches`
   const reqBody: {
@@ -54,10 +54,10 @@ const createJobBatch = async (
     fileUris: [documentName],
   }
 
-  if (isWorkflowMT) {
+  if (workflowUid) {
     reqBody.localeWorkflows = localeIds.map(l => ({
       targetLocaleId: l,
-      workflowUid: '',
+      workflowUid,
     }))
   }
 
@@ -102,7 +102,7 @@ export const createTask = async (
   document: Record<string, any>,
   localeIds: string[],
   secrets: Secrets,
-  isWorkflowMT?: boolean
+  workflowUid?: string
 ) => {
   const accessToken = await authenticate(secrets.secret)
 
@@ -128,7 +128,7 @@ export const createTask = async (
     document.name,
     accessToken,
     localeIds,
-    isWorkflowMT
+    workflowUid
   )
   const uploadFileRes = await uploadFileToBatch(
     batchUid,
