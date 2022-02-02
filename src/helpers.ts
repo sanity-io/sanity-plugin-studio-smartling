@@ -17,6 +17,9 @@ export const findLatestDraft = (documentId: string, ignoreI18n = true) => {
       (docs: SanityDocument[]) =>
         docs.find(doc => doc._id.includes('draft')) ?? docs[0]
     )
+    .catch(err => {
+      throw err
+    })
 }
 
 //revision fetch
@@ -30,6 +33,10 @@ export const findDocumentAtRevision = async (
   let revisionDoc = await fetch(url, { credentials: 'include' })
     .then(req => req.json())
     .then(req => req.documents[0])
+    .catch(err => {
+      throw err
+    })
+
   /* endpoint will silently give you incorrect doc
    * if you don't request draft and the rev belongs to a draft, so check
    */
@@ -39,7 +46,11 @@ export const findDocumentAtRevision = async (
     revisionDoc = await fetch(url, { credentials: 'include' })
       .then(req => req.json())
       .then(req => req.documents[0])
+      .catch(err => {
+        throw err
+      })
   }
+
   return revisionDoc
 }
 
@@ -49,45 +60,55 @@ export const documentLevelPatch = async (
   translatedFields: SanityDocument,
   localeId: string
 ) => {
-  let baseDoc: SanityDocument
-  if (translatedFields._rev) {
-    baseDoc = await findDocumentAtRevision(documentId, translatedFields._rev)
-  } else {
-    baseDoc = await findLatestDraft(documentId)
-  }
-
-  const merged = BaseDocumentMerger.documentLevelMerge(
-    translatedFields,
-    baseDoc
-  )
-  const targetId = `i18n.${documentId}.${localeId}`
-  const i18nDoc = await findLatestDraft(targetId, false)
-
-  if (i18nDoc) {
-    const cleanedMerge: Record<string, any> = {}
-    //don't overwrite any existing values on the i18n doc
-    Object.entries(merged).forEach(([key, value]) => {
-      if (
-        Object.keys(translatedFields).includes(key) &&
-        !['_id', '_rev', '_updatedAt'].includes(key)
-      ) {
-        cleanedMerge[key] = value
-      }
-    })
-    client
-      .transaction()
-      //@ts-ignore
-      .patch(i18nDoc._id, p => p.set(cleanedMerge))
-      .commit()
-  } else {
-    merged._id = `drafts.${targetId}`
-    //account for legacy implementations of i18n plugin lang
-    if (baseDoc._lang) {
-      merged._lang = localeId
-    } else if (baseDoc.__i18n_lang) {
-      merged.__i18n_lang = localeId
+  try {
+    let baseDoc: SanityDocument
+    if (translatedFields._rev) {
+      baseDoc = await findDocumentAtRevision(documentId, translatedFields._rev)
+    } else {
+      baseDoc = await findLatestDraft(documentId)
     }
-    client.create(merged)
+
+    const merged = BaseDocumentMerger.documentLevelMerge(
+      translatedFields,
+      baseDoc
+    )
+    const targetId = `i18n.${documentId}.${localeId}`
+    const i18nDoc = await findLatestDraft(targetId, false)
+
+    if (i18nDoc) {
+      const cleanedMerge: Record<string, any> = {}
+      //don't overwrite any existing values on the i18n doc
+      Object.entries(merged).forEach(([key, value]) => {
+        if (
+          Object.keys(translatedFields).includes(key) &&
+          !['_id', '_rev', '_updatedAt'].includes(key)
+        ) {
+          cleanedMerge[key] = value
+        }
+      })
+
+      await client
+        .transaction()
+        //@ts-ignore
+        .patch(i18nDoc._id, p => p.set(cleanedMerge))
+        .commit()
+        .catch(err => {
+          throw err
+        })
+    } else {
+      merged._id = `drafts.${targetId}`
+      //account for legacy implementations of i18n plugin lang
+      if (baseDoc._lang) {
+        merged._lang = localeId
+      } else if (baseDoc.__i18n_lang) {
+        merged.__i18n_lang = localeId
+      }
+      client.create(merged).catch(err => {
+        throw err
+      })
+    }
+  } catch (err) {
+    throw err
   }
 }
 
@@ -97,20 +118,29 @@ export const fieldLevelPatch = async (
   translatedFields: SanityDocument,
   localeId: string
 ) => {
-  let baseDoc: SanityDocument
-  if (translatedFields._rev) {
-    baseDoc = await findDocumentAtRevision(documentId, translatedFields._rev)
-  } else {
-    baseDoc = await findLatestDraft(documentId)
+  try {
+    let baseDoc: SanityDocument
+    if (translatedFields._rev) {
+      baseDoc = await findDocumentAtRevision(documentId, translatedFields._rev)
+    } else {
+      baseDoc = await findLatestDraft(documentId)
+    }
+
+    const merged = BaseDocumentMerger.fieldLevelMerge(
+      translatedFields,
+      baseDoc,
+      localeId,
+      'en'
+    )
+
+    await client
+      .patch(baseDoc._id)
+      .set(merged)
+      .commit()
+      .catch(err => {
+        throw err
+      })
+  } catch (err) {
+    throw err
   }
-  const merged = BaseDocumentMerger.fieldLevelMerge(
-    translatedFields,
-    baseDoc,
-    localeId,
-    'en'
-  )
-  client
-    .patch(baseDoc._id)
-    .set(merged)
-    .commit()
 }

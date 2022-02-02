@@ -12,34 +12,53 @@ import { SanityDocument } from '@sanity/types'
 
 const defaultDocumentLevelConfig = {
   exportForTranslation: async (id: string) => {
-    const doc = await findLatestDraft(id)
-    const serialized = BaseDocumentSerializer.serializeDocument(doc, 'document')
-    //needed for lookup by translation tab
-    serialized.name = id
-    return serialized
+    try {
+      const doc = await findLatestDraft(id)
+      const serialized = BaseDocumentSerializer.serializeDocument(
+        doc,
+        'document'
+      )
+      //needed for lookup by translation tab
+      serialized.name = id
+      return serialized
+    } catch (err) {
+      throw err
+    }
   },
-  importTranslation: (id: string, localeId: string, document: string) => {
-    const deserialized = BaseDocumentDeserializer.deserializeDocument(
-      document
-    ) as SanityDocument
-    documentLevelPatch(id, deserialized, localeId)
+  importTranslation: async (id: string, localeId: string, document: string) => {
+    try {
+      const deserialized = BaseDocumentDeserializer.deserializeDocument(
+        document
+      ) as SanityDocument
+      await documentLevelPatch(id, deserialized, localeId)
+    } catch (err) {
+      throw err
+    }
   },
   adapter: SmartlingAdapter,
 }
 
 const defaultFieldLevelConfig = {
   exportForTranslation: async (id: string) => {
-    const doc = await findLatestDraft(id)
-    const serialized = BaseDocumentSerializer.serializeDocument(doc, 'field')
-    //needed for lookup by translation tab
-    serialized.name = id
-    return serialized
+    try {
+      const doc = await findLatestDraft(id)
+      const serialized = BaseDocumentSerializer.serializeDocument(doc, 'field')
+      //needed for lookup by translation tab
+      serialized.name = id
+      return serialized
+    } catch (err) {
+      throw err
+    }
   },
-  importTranslation: (id: string, localeId: string, document: string) => {
-    const deserialized = BaseDocumentDeserializer.deserializeDocument(
-      document
-    ) as SanityDocument
-    fieldLevelPatch(id, deserialized, localeId)
+  importTranslation: async (id: string, localeId: string, document: string) => {
+    try {
+      const deserialized = BaseDocumentDeserializer.deserializeDocument(
+        document
+      ) as SanityDocument
+      await fieldLevelPatch(id, deserialized, localeId)
+    } catch (err) {
+      throw err
+    }
   },
   adapter: SmartlingAdapter,
 }
