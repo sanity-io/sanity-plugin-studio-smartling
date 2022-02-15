@@ -18,11 +18,11 @@ const defaultDocumentLevelConfig = {
     serialized.name = id
     return serialized
   },
-  importTranslation: (id: string, localeId: string, document: string) => {
+  importTranslation: async (id: string, localeId: string, document: string) => {
     const deserialized = BaseDocumentDeserializer.deserializeDocument(
       document
     ) as SanityDocument
-    documentLevelPatch(id, deserialized, localeId)
+    await documentLevelPatch(id, deserialized, localeId)
   },
   adapter: SmartlingAdapter,
 }
@@ -35,11 +35,11 @@ const defaultFieldLevelConfig = {
     serialized.name = id
     return serialized
   },
-  importTranslation: (id: string, localeId: string, document: string) => {
+  importTranslation: async (id: string, localeId: string, document: string) => {
     const deserialized = BaseDocumentDeserializer.deserializeDocument(
       document
     ) as SanityDocument
-    fieldLevelPatch(id, deserialized, localeId)
+    await fieldLevelPatch(id, deserialized, localeId)
   },
   adapter: SmartlingAdapter,
 }

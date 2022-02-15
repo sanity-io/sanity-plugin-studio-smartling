@@ -13,7 +13,16 @@ export const getTranslation = async (
     headers: getHeaders(url, accessToken),
   })
     .then(res => res.json())
-    .then(res => res.body)
+    .then(res => {
+      if (res.body) {
+        return res.body
+      } else if (res.response.errors) {
+        const errMsg =
+          res.response.errors[0]?.message ||
+          'Error retrieving translation from Smartling'
+        throw new Error(errMsg)
+      }
+    })
 
   return translatedHTML
 }

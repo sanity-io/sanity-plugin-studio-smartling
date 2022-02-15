@@ -30,6 +30,7 @@ export const findDocumentAtRevision = async (
   let revisionDoc = await fetch(url, { credentials: 'include' })
     .then(req => req.json())
     .then(req => req.documents[0])
+
   /* endpoint will silently give you incorrect doc
    * if you don't request draft and the rev belongs to a draft, so check
    */
@@ -40,6 +41,7 @@ export const findDocumentAtRevision = async (
       .then(req => req.json())
       .then(req => req.documents[0])
   }
+
   return revisionDoc
 }
 
@@ -74,7 +76,8 @@ export const documentLevelPatch = async (
         cleanedMerge[key] = value
       }
     })
-    client
+
+    await client
       .transaction()
       //@ts-ignore
       .patch(i18nDoc._id, p => p.set(cleanedMerge))
@@ -103,13 +106,15 @@ export const fieldLevelPatch = async (
   } else {
     baseDoc = await findLatestDraft(documentId)
   }
+
   const merged = BaseDocumentMerger.fieldLevelMerge(
     translatedFields,
     baseDoc,
     localeId,
     'en'
   )
-  client
+
+  await client
     .patch(baseDoc._id)
     .set(merged)
     .commit()
