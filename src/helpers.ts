@@ -29,7 +29,7 @@ export const findDocumentAtRevision = async (
   let url = client.getUrl(baseUrl)
   let revisionDoc = await fetch(url, { credentials: 'include' })
     .then(req => req.json())
-    .then(req => req.documents[0])
+    .then(req => req.documents && req.documents[0])
   /* endpoint will silently give you incorrect doc
    * if you don't request draft and the rev belongs to a draft, so check
    */
