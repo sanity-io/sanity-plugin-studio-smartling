@@ -20,10 +20,11 @@ export const getTranslationTask = async (
     }
   }
 
-  const url = `https://api.smartling.com/jobs-api/v3/projects/${secrets.project}/jobs/${taskId}/progress`
+  const projectId = secrets.project
+  const progressUrl = `https://api.smartling.com/jobs-api/v3/projects/${projectId}/jobs/${taskId}/progress`
   const smartlingTask = await fetch(smartlingProxy, {
     method: 'POST',
-    headers: getHeaders(url, accessToken),
+    headers: getHeaders(progressUrl, accessToken),
   })
     .then(res => res.json())
     .then(res => res.response.data)
@@ -41,5 +42,6 @@ export const getTranslationTask = async (
     locales,
     //since our download is tied to document id for smartling, keep track of it as a task
     taskId: documentId,
+    linkToVendorTask: `https://dashboard.smartling.com/app/projects/${projectId}/account-jobs/${projectId}:${taskId}`,
   }
 }
