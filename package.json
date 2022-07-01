@@ -54,6 +54,6 @@
     "typescript": "^4.0.5"
   },
   "dependencies": {
-    "sanity-translations-tab": "^2.0.0"
+    "sanity-translations-tab": "^2.0.1"
   }
 }
