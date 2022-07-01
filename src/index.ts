@@ -1,51 +1,40 @@
-import { TranslationsTab } from 'sanity-translations-tab'
 import {
+  TranslationsTab,
+  baseDocumentLevelConfig,
+  baseFieldLevelConfig,
+  findLatestDraft,
   BaseDocumentDeserializer,
   BaseDocumentSerializer,
   BaseDocumentMerger,
   defaultStopTypes,
   customSerializers,
-} from 'sanity-naive-html-serializer'
+  Adapter,
+} from 'sanity-translations-tab'
 import { SmartlingAdapter } from './adapter'
-import { findLatestDraft, documentLevelPatch, fieldLevelPatch } from './helpers'
-import { SanityDocument } from '@sanity/types'
 
-const defaultDocumentLevelConfig = {
-  exportForTranslation: async (id: string) => {
-    const doc = await findLatestDraft(id)
-    const serialized = BaseDocumentSerializer.serializeDocument(doc, 'document')
-    //needed for lookup by translation tab
-    serialized.name = id
-    return serialized
-  },
-  importTranslation: async (id: string, localeId: string, document: string) => {
-    const deserialized = BaseDocumentDeserializer.deserializeDocument(
-      document
-    ) as SanityDocument
-    await documentLevelPatch(id, deserialized, localeId)
-  },
+interface ConfigOptions {
+  adapter: Adapter
+  secretsNamespace: string | null
+  exportForTranslation: (id: string) => Promise<Record<string, any>>
+  importTranslation: (
+    id: string,
+    localeId: string,
+    doc: string
+  ) => Promise<void>
+}
+const defaultDocumentLevelConfig: ConfigOptions = {
+  ...baseDocumentLevelConfig,
   adapter: SmartlingAdapter,
 }
 
-const defaultFieldLevelConfig = {
-  exportForTranslation: async (id: string) => {
-    const doc = await findLatestDraft(id)
-    const serialized = BaseDocumentSerializer.serializeDocument(doc, 'field')
-    //needed for lookup by translation tab
-    serialized.name = id
-    return serialized
-  },
-  importTranslation: async (id: string, localeId: string, document: string) => {
-    const deserialized = BaseDocumentDeserializer.deserializeDocument(
-      document
-    ) as SanityDocument
-    await fieldLevelPatch(id, deserialized, localeId)
-  },
+const defaultFieldLevelConfig: ConfigOptions = {
+  ...baseFieldLevelConfig,
   adapter: SmartlingAdapter,
 }
 
 export {
   TranslationsTab,
+  findLatestDraft,
   BaseDocumentDeserializer,
   BaseDocumentSerializer,
   BaseDocumentMerger,

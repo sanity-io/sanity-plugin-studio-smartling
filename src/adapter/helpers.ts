@@ -33,7 +33,15 @@ export const findExistingJob = async (
     .then(res => res.json())
     .then(res => {
       if (res.response.data.items.length) {
-        return res.response.data.items[0].translationJobUid
+        //smartling will fuzzy match job names. We need to be precise.
+        const correctJob = res.response.data.items.find(
+          item => item.jobName && item.jobName === documentId
+        )
+        if (correctJob) {
+          return correctJob.translationJobUid
+        } else {
+          return ''
+        }
       } else {
         return ''
       }
