@@ -9,6 +9,8 @@ import {
   defaultStopTypes,
   customSerializers,
   Adapter,
+  documentLevelPatch,
+  fieldLevelPatch,
 } from 'sanity-translations-tab'
 import { SmartlingAdapter } from './adapter'
 
@@ -35,6 +37,8 @@ const defaultFieldLevelConfig: ConfigOptions = {
 export {
   TranslationsTab,
   findLatestDraft,
+  documentLevelPatch,
+  fieldLevelPatch,
   BaseDocumentDeserializer,
   BaseDocumentSerializer,
   BaseDocumentMerger,
