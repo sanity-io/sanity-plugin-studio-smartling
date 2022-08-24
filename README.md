@@ -14,6 +14,7 @@ This is a separate plugin, and differs in that it provides editors a visual prog
 - [Quickstart](#quickstart)
 - [Studio experience](#studio-experience)
 - [Overriding defaults](#overriding-defaults)
+- [v1 to v2 changes](#v1-to-v2-changes)
 
 ## Plugin features
 
@@ -44,7 +45,7 @@ For example, on a document you don't want to be translated, you may have a "titl
 *Important*: Smartling's locale representation includes hyphens, like `fr-FR`. These aren't valid as Sanity field names, so ensure that on your fields you change the hyphens to underscores (like `fr_FR`).
 
 ### Document level translations
-Since we often find users want to use the [Internationalization input plugin](https://www.sanity.io/plugins/sanity-plugin-intl-input) if they're using document-level translations, we assume that any documents you want in different languages will follow the pattern `i18n.{id-of-base-language-document}.{locale}`
+Since we often find users want to use the [Document internationalization plugin](https://www.sanity.io/plugins/document-internationalization) if they're using document-level translations, we assume that any documents you want in different languages will follow the pattern `{id-of-base-language-document}__i18n_{locale}`
 
 ### Final note
 It's okay if your data doesn't follow these patterns and you don't want to change them! You will simply have to override how the plugin gets and patches back information from your documents. Please see [Overriding defaults](#overriding-defaults).
@@ -120,3 +121,26 @@ To personalize this configuration it's useful to know what arguments go into `Tr
 There are a number of reasons to override these functions. More general cases are often around ensuring documents serialize and deserialize correctly. Since the serialization fucntions are used across all our translation plugins currently, you can find some frequently encountered scenarios at [their repository here](https://github.com/sanity-io/sanity-naive-html-serializer), along with code examples for new config. 
 
 This plugin is in early stages. We plan on improving some of the user-facing Chrome, sorting out some quiet bugs, figuring out where things don't fail elegantly, etc. Please be a part of our development process!
+
+## V1 to V2 changes
+
+Most users will not encounter issues in upgrading to v2. The breaking changes are as follows:
+
+1. **Change to document-level localization id structure.** Since the [Internationalization input plugin](https://www.sanity.io/plugins/sanity-plugin-intl-input) was deprecated, the default pattern `i18n.{id-of-base-language-document}.{locale}` was deprecated in favor of `{id-of-base-language-document}__i18n_{locale}`. If you would like to maintain that pattern, please add the `idStructure` param to your tab config, like:
+```javascript
+S.view.component(TranslationsTab).title('Smartling').options(
+  {...defaultDocumentLevelConfig, idStructure: 'subpath'}
+)
+```
+2. **Underlying changes in serializers.** Serializers were updated to a) take advantage of the newer [Portable Text to HTML package](https://github.com/portabletext/to-html) and allow for explicit schema closures. If you were overriding serialization methods, that means invocation of `BaseDocumentSerializer` will change from:
+```javascript
+BaseDocumentSerializer.serializeDocument(id, 'serialization-level')
+```
+
+to:
+```javascript
+import schemas from 'part:@sanity/base/schema'
+
+BaseDocumentSerializer(schemas).serializeDocument(id, 'serialization-level')
+```
+
