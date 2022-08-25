@@ -120,7 +120,7 @@ To personalize this configuration it's useful to know what arguments go into `Tr
 
 There are a number of reasons to override these functions. More general cases are often around ensuring documents serialize and deserialize correctly. Since the serialization fucntions are used across all our translation plugins currently, you can find some frequently encountered scenarios at [their repository here](https://github.com/sanity-io/sanity-naive-html-serializer), along with code examples for new config. 
 
-This plugin is in early stages. We plan on improving some of the user-facing Chrome, sorting out some quiet bugs, figuring out where things don't fail elegantly, etc. Please be a part of our development process!
+This plugin is in early stages. We plan on improving some of the user-facing chrome, sorting out some quiet bugs, figuring out where things don't fail elegantly, etc. Please be a part of our development process!
 
 ## V1 to V2 changes
 
