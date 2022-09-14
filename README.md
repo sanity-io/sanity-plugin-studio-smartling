@@ -63,7 +63,7 @@ SANITY_STUDIO_SMARTLING_PROXY=http://your-proxy-url.com
 
 4. Ensure the plugin has access to your Smartling token secret. You'll want to create a document that includes your project name and a token secret with appropriate access. [Please refer to the Smartling documentation on creating a token if you don't have one already.](https://help.smartling.com/hc/en-us/articles/115004187694-API-Tokens-)
     * In your studio, create a file called `populateSmartlingSecrets.js`.
-    * Place the following in the file and fill out the correct values (those in all-caps).
+    * Place the following in the file and fill out the correct values.
 
 ```javascript
 import sanityClient from 'part:@sanity/base/client'
@@ -75,7 +75,7 @@ _id: 'translationService.secrets',
 _type: 'smartlingSettings',
 organization: 'YOUR_ORG_HERE',
 project: 'YOUR_PROJECT_HERE',
-secret: 'YOUR_TOKEN_SECRET_HERE',
+secret: '"{"userIdentifier":"xxxxxx","userSecret":"xxxx"}"', //in this format from Smartling
 })
 ```
 
