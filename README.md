@@ -75,7 +75,7 @@ _id: 'translationService.secrets',
 _type: 'smartlingSettings',
 organization: 'YOUR_ORG_HERE',
 project: 'YOUR_PROJECT_HERE',
-secret: '"{"userIdentifier":"xxxxxx","userSecret":"xxxx"}"', //in this format from Smartling
+secret: '{"userIdentifier":"xxxxxx","userSecret":"xxxx"}', //in this format from Smartling
 })
 ```
 
