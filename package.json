@@ -1,6 +1,6 @@
 {
   "name": "sanity-plugin-studio-smartling",
-  "version": "2.0.6",
+  "version": "3.0.0",
   "description": "!smartling gif",
   "keywords": [
     "sanity",
@@ -38,9 +38,7 @@
   ],
   "scripts": {
     "build": "run-s clean && plugin-kit verify-package --silent && pkg-utils build --strict && pkg-utils --strict",
-    "lint": "eslint .",
-    "size": "size-limit",
-    "analyze": "size-limit --why",
+    "lint": "eslint . --fix",
     "clean": "rimraf dist",
     "format": "prettier --write --cache --ignore-unknown .",
     "link-watch": "plugin-kit link-watch",

@@ -2,7 +2,7 @@ import {smartlingProxy, authenticate, getHeaders, findExistingJob} from './helpe
 import {Adapter, Secrets} from 'sanity-translations-tab'
 import {getTranslationTask} from './getTranslationTask'
 
-const createJob = async (
+const createJob = (
   jobName: string,
   projectId: string,
   localeIds: string[],
@@ -29,13 +29,15 @@ const createJob = async (
  * and is able to be used for new bulk
  * job functionality.
  */
-const createJobBatch = async (
+
+const createJobBatch = (
   jobId: string,
   projectId: string,
   documentName: string,
   accessToken: string,
   localeIds: string[],
   workflowUid?: string
+  //eslint-disable-next-line max-params
 ) => {
   const url = `https://api.smartling.com/job-batches-api/v2/projects/${projectId}/batches`
   const reqBody: {
@@ -68,7 +70,7 @@ const createJobBatch = async (
     .then((res) => res.response.data.batchUid)
 }
 
-const uploadFileToBatch = async (
+const uploadFileToBatch = (
   batchUid: string,
   document: Record<string, any>,
   projectId: string,
@@ -129,5 +131,5 @@ export const createTask: Adapter['createTask'] = async (
   //eslint-disable-next-line no-console -- for developer debugging
   console.info('Upload status from Smartling: ', uploadFileRes)
 
-  return getTranslationTask(documentId, secrets)!
+  return getTranslationTask(documentId, secrets)
 }

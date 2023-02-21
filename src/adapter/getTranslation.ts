@@ -27,6 +27,7 @@ export const getTranslation: Adapter['getTranslation'] = async (
           res.response.errors[0]?.message || 'Error retrieving translation from Smartling'
         throw new Error(errMsg)
       }
+      return ''
     })
 
   return translatedHTML

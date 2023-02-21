@@ -1,6 +1,10 @@
+interface Headers {
+  [key: string]: string
+}
+//eslint-disable-next-line no-process-env
 export const smartlingProxy = process.env.SANITY_STUDIO_SMARTLING_PROXY || ''
 
-export const authenticate = async (secret: string) => {
+export const authenticate = (secret: string): Promise<string> => {
   const url = 'https://api.smartling.com/auth-api/v2/authenticate'
   const headers = {
     'content-type': 'application/json',
@@ -15,12 +19,12 @@ export const authenticate = async (secret: string) => {
     .then((res) => res.response.data.accessToken)
 }
 
-export const getHeaders = (url: string, accessToken: string) => ({
+export const getHeaders = (url: string, accessToken: string): Headers => ({
   Authorization: `Bearer ${accessToken}`,
   'X-URL': url,
 })
 
-export const findExistingJob = async (
+export const findExistingJob = (
   documentId: string,
   projectId: string,
   accessToken: string
