@@ -1,11 +1,6 @@
-import {
-  smartlingProxy,
-  authenticate,
-  getHeaders,
-  findExistingJob,
-} from './helpers'
-import { Secrets } from 'sanity-translations-tab'
-import { getTranslationTask } from './getTranslationTask'
+import {smartlingProxy, authenticate, getHeaders, findExistingJob} from './helpers'
+import {Adapter, Secrets} from 'sanity-translations-tab'
+import {getTranslationTask} from './getTranslationTask'
 
 const createJob = async (
   jobName: string,
@@ -25,8 +20,8 @@ const createJob = async (
       targetLocaleIds: localeIds,
     }),
   })
-    .then(res => res.json())
-    .then(res => res.response.data.translationJobUid)
+    .then((res) => res.json())
+    .then((res) => res.response.data.translationJobUid)
 }
 
 /* we're using batches here because it eliminates some
@@ -47,7 +42,7 @@ const createJobBatch = async (
     authorize: boolean
     translationJobUid: string
     fileUris: string[]
-    localeWorkflows?: { targetLocaleId: string; workflowUid: string }[]
+    localeWorkflows?: {targetLocaleId: string; workflowUid: string}[]
   } = {
     authorize: true,
     translationJobUid: jobId,
@@ -55,7 +50,7 @@ const createJobBatch = async (
   }
 
   if (workflowUid) {
-    reqBody.localeWorkflows = localeIds.map(l => ({
+    reqBody.localeWorkflows = localeIds.map((l) => ({
       targetLocaleId: l,
       workflowUid,
     }))
@@ -69,8 +64,8 @@ const createJobBatch = async (
     },
     body: JSON.stringify(reqBody),
   })
-    .then(res => res.json())
-    .then(res => res.response.data.batchUid)
+    .then((res) => res.json())
+    .then((res) => res.response.data.batchUid)
 }
 
 const uploadFileToBatch = async (
@@ -86,42 +81,36 @@ const uploadFileToBatch = async (
   formData.append('fileType', 'html')
   const htmlBuffer = Buffer.from(document.content, 'utf-8')
   formData.append('file', new Blob([htmlBuffer]), `${document.name}.html`)
-  localeIds.forEach(localeId =>
-    formData.append('localeIdsToAuthorize[]', localeId)
-  )
+  localeIds.forEach((localeId) => formData.append('localeIdsToAuthorize[]', localeId))
 
   return fetch(smartlingProxy, {
     method: 'POST',
     headers: getHeaders(url, accessToken),
     body: formData,
-  }).then(res => res.json())
+  }).then((res) => res.json())
 }
 
-export const createTask = async (
+//@ts-ignore until return TranslationTask type is added to sanity-translations-tab
+export const createTask: Adapter['createTask'] = async (
   documentId: string,
   document: Record<string, any>,
   localeIds: string[],
-  secrets: Secrets,
+  secrets: Secrets | null,
   workflowUid?: string
 ) => {
-  const accessToken = await authenticate(secrets.secret)
-
-  //TODO: announce errors here
-  let taskId = await findExistingJob(
-    document.name,
-    secrets.project,
-    accessToken
-  )
-  if (!taskId) {
-    taskId = await createJob(
-      document.name,
-      secrets.project,
-      localeIds,
-      accessToken
+  if (!secrets?.project || !secrets?.secret) {
+    throw new Error(
+      'The Smartling adapter requires a project ID and a secret key. Please check your secrets document in this dataset, per the plugin documentation.'
     )
   }
 
-  //TODO: log errors here if needed
+  const accessToken = await authenticate(secrets.secret)
+
+  let taskId = await findExistingJob(document.name, secrets.project, accessToken)
+  if (!taskId) {
+    taskId = await createJob(document.name, secrets.project, localeIds, accessToken)
+  }
+
   const batchUid = await createJobBatch(
     taskId,
     secrets.project,
@@ -137,7 +126,8 @@ export const createTask = async (
     localeIds,
     accessToken
   )
-  console.log('upload status', uploadFileRes)
+  //eslint-disable-next-line no-console -- for developer debugging
+  console.info('Upload status from Smartling: ', uploadFileRes)
 
-  return getTranslationTask(documentId, secrets)
+  return getTranslationTask(documentId, secrets)!
 }
