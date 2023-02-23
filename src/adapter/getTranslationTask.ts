@@ -1,4 +1,4 @@
-import {smartlingProxy, authenticate, getHeaders, findExistingJob} from './helpers'
+import {authenticate, getHeaders, findExistingJob} from './helpers'
 import {Adapter, Secrets} from 'sanity-translations-tab'
 
 interface SmartlingProgressItem {
@@ -12,14 +12,16 @@ export const getTranslationTask: Adapter['getTranslationTask'] = async (
   documentId: string,
   secrets: Secrets | null
 ) => {
-  if (!secrets?.project || !secrets?.secret) {
+  if (!secrets?.project || !secrets?.secret || !secrets?.proxy) {
     throw new Error(
-      'The Smartling adapter requires a project ID and a secret key. Please check your secrets document in this dataset, per the plugin documentation.'
+      'The Smartling adapter requires a project ID, a secret key, and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.'
     )
   }
 
-  const accessToken = await authenticate(secrets.secret)
-  const taskId = await findExistingJob(documentId, secrets.project, accessToken)
+  const {project, proxy} = secrets
+
+  const accessToken = await authenticate(secrets)
+  const taskId = await findExistingJob(documentId, secrets, accessToken)
   if (!taskId) {
     return {
       documentId,
@@ -28,10 +30,9 @@ export const getTranslationTask: Adapter['getTranslationTask'] = async (
     }
   }
 
-  const projectId = secrets.project
-  const progressUrl = `https://api.smartling.com/jobs-api/v3/projects/${projectId}/jobs/${taskId}/progress`
-  const smartlingTask = await fetch(smartlingProxy, {
-    method: 'POST',
+  const progressUrl = `https://api.smartling.com/jobs-api/v3/projects/${project}/jobs/${taskId}/progress`
+  const smartlingTask = await fetch(proxy, {
+    method: 'GET',
     headers: getHeaders(progressUrl, accessToken),
   })
     .then((res) => res.json())
@@ -50,6 +51,6 @@ export const getTranslationTask: Adapter['getTranslationTask'] = async (
     locales,
     //since our download is tied to document id for smartling, keep track of it as a task
     taskId: documentId,
-    linkToVendorTask: `https://dashboard.smartling.com/app/projects/${projectId}/account-jobs/${projectId}:${taskId}`,
+    linkToVendorTask: `https://dashboard.smartling.com/app/projects/${project}/account-jobs/${project}:${taskId}`,
   }
 }

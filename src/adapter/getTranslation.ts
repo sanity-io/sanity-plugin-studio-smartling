@@ -1,4 +1,4 @@
-import {smartlingProxy, authenticate, getHeaders} from './helpers'
+import {authenticate, getHeaders} from './helpers'
 import {Adapter, Secrets} from 'sanity-translations-tab'
 
 export const getTranslation: Adapter['getTranslation'] = async (
@@ -6,16 +6,18 @@ export const getTranslation: Adapter['getTranslation'] = async (
   localeId: string,
   secrets: Secrets | null
 ) => {
-  if (!secrets?.project || !secrets?.secret) {
+  if (!secrets?.project || !secrets?.secret || !secrets?.proxy) {
     throw new Error(
-      'The Smartling adapter requires a project ID and a secret key. Please check your secrets document in this dataset, per the plugin documentation.'
+      'The Smartling adapter requires a project ID, a secret key, and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.'
     )
   }
 
-  const url = `https://api.smartling.com/files-api/v2/projects/${secrets.project}/locales/${localeId}/file?fileUri=${taskId}&retrievalType=pending`
-  const accessToken = await authenticate(secrets.secret)
-  const translatedHTML = await fetch(smartlingProxy, {
-    method: 'POST',
+  const {project, proxy} = secrets
+
+  const url = `https://api.smartling.com/files-api/v2/projects/${project}/locales/${localeId}/file?fileUri=${taskId}&retrievalType=pending`
+  const accessToken = await authenticate(secrets)
+  const translatedHTML = await fetch(proxy, {
+    method: 'GET',
     headers: getHeaders(url, accessToken),
   })
     .then((res) => res.json())

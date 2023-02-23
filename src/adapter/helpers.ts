@@ -1,16 +1,22 @@
+import {Secrets} from 'sanity-translations-tab'
+
 interface Headers {
   [key: string]: string
 }
-//eslint-disable-next-line no-process-env
-export const smartlingProxy = process.env.SANITY_STUDIO_SMARTLING_PROXY || ''
 
-export const authenticate = (secret: string): Promise<string> => {
+export const authenticate = (secrets: Secrets): Promise<string> => {
   const url = 'https://api.smartling.com/auth-api/v2/authenticate'
   const headers = {
     'content-type': 'application/json',
     'X-URL': url,
   }
-  return fetch(smartlingProxy, {
+  const {secret, proxy} = secrets
+  if (!secret || !proxy) {
+    throw new Error(
+      'The Smartling adapter requires a secret key and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.'
+    )
+  }
+  return fetch(proxy, {
     headers,
     method: 'POST',
     body: JSON.stringify(secret),
@@ -26,11 +32,17 @@ export const getHeaders = (url: string, accessToken: string): Headers => ({
 
 export const findExistingJob = (
   documentId: string,
-  projectId: string,
+  secrets: Secrets,
   accessToken: string
 ): Promise<string> => {
-  const url = `https://api.smartling.com/jobs-api/v3/projects/${projectId}/jobs?jobName=${documentId}`
-  return fetch(smartlingProxy, {
+  const {project, proxy} = secrets
+  if (!project || !proxy) {
+    throw new Error(
+      'The Smartling adapter requires a Smartling project identifier and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.'
+    )
+  }
+  const url = `https://api.smartling.com/jobs-api/v3/projects/${project}/jobs?jobName=${documentId}`
+  return fetch(proxy, {
     method: 'POST',
     headers: getHeaders(url, accessToken),
   })
