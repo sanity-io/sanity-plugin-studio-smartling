@@ -107,7 +107,6 @@ const uploadFileToBatch = (
   }).then((res) => res.json())
 }
 
-//@ts-ignore until return TranslationTask type is added to sanity-translations-tab
 export const createTask: Adapter['createTask'] = async (
   documentId: string,
   document: Record<string, any>,

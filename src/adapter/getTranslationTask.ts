@@ -1,11 +1,19 @@
 import {authenticate, getHeaders, findExistingJob} from './helpers'
 import {Adapter, Secrets} from 'sanity-translations-tab'
 
+interface WorkflowProgressItem {
+  workflowStepSummaryReportItemList: {
+    wordCount: number
+  }[]
+}
+
 interface SmartlingProgressItem {
   targetLocaleId: string
   progress: {
     percentComplete: number
+    totalWordCount: number
   }
+  workflowProgressReportList: WorkflowProgressItem[]
 }
 
 export const getTranslationTask: Adapter['getTranslationTask'] = async (
@@ -40,10 +48,33 @@ export const getTranslationTask: Adapter['getTranslationTask'] = async (
 
   let locales = []
   if (smartlingTask && smartlingTask.contentProgressReport) {
-    locales = smartlingTask.contentProgressReport.map((item: SmartlingProgressItem) => ({
-      localeId: item.targetLocaleId,
-      progress: item.progress ? item.progress.percentComplete : 0,
-    }))
+    locales = smartlingTask.contentProgressReport.map((item: SmartlingProgressItem) => {
+      let progress = item.progress ? item.progress.percentComplete : 0
+      if (
+        item.workflowProgressReportList &&
+        item.workflowProgressReportList.length > 0 &&
+        item.progress
+      ) {
+        //default to the first workflow -- it's likely what is being used
+        const progressItem = item.workflowProgressReportList[0]
+        //this is a list of the various steps in the workflow
+        if (
+          progressItem.workflowStepSummaryReportItemList &&
+          progressItem.workflowStepSummaryReportItemList.length > 1
+        ) {
+          //get the last step in the workflow -- usually "published"
+          const lastStep = progressItem.workflowStepSummaryReportItemList.at(-1)
+          //get the percentage of how many words have reached the last step
+          if (lastStep && lastStep.wordCount >= 0) {
+            progress = Math.floor((lastStep.wordCount / item.progress.totalWordCount) * 100) ?? 0
+          }
+        }
+      }
+      return {
+        localeId: item.targetLocaleId,
+        progress,
+      }
+    })
   }
 
   return {
