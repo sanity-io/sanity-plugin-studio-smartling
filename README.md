@@ -248,11 +248,13 @@ and run the script with `sanity exec patchSmartlingSecrets.js --with-user-token`
 
 Alternatively, you can re-run the `populateSmartlingSecrets` script in [Quickstart](#quickstart) to create a new secrets document with the proxy set.
 
-We apologize for the inconvenience. Because of the new embeddability of the studio, developers may find that their v3 Studio is built and deployed in different ways, with access to different environments. Keeping this setting in `secrets` allows developers to set it in a way that works for their deployment and reduce complexity.
+We apologize for the inconvenience. Because of the new embeddability of the studio, developers may find that their v3 Studio is built and deployed in different ways, with access to different environments. Keeping this setting in `secrets` allows developers to set it in a way that works for their deployment and reduce complexity. You can find more information on our guidance around environment variables [here](https://github.com/sanity-io/sanity/releases/tag/v3.5.0).
 
 Otherwise, you should not have to do anything to migrate to Sanity Studio v3. If you are using the default configs, you should be able to upgrade without any changes. If you are using custom serialization, you may need to update how `BaseDocumentSerializer` receives your schema.
 
 These are outlined in the serializer README [here](https://github.com/sanity-io/sanity-naive-html-serializer#v2-to-v3-changes).
+
+The final change from the v2 to v3 version of the plugin is in how progress in a translation job is calculated. The plugin will now count progress as the percentage of all strings that have reached the final stage of a Smartling workflow.
 
 ## License
 
