@@ -21,9 +21,11 @@ export const getTranslationTask: Adapter['getTranslationTask'] = async (
   secrets: Secrets | null
 ) => {
   if (!secrets?.project || !secrets?.secret || !secrets?.proxy) {
-    throw new Error(
-      'The Smartling adapter requires a project ID, a secret key, and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.'
-    )
+    return {
+      documentId,
+      taskId: documentId,
+      locales: [],
+    }
   }
 
   const {project, proxy} = secrets
