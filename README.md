@@ -35,7 +35,7 @@ npm install sanity-plugin-studio-smartling
 
 2. Because of Smartling CORS restrictions, you will need to set up a proxy endpoint to funnel requests to Smartling. We've provided a tiny Next.js app you can set up [here](https://github.com/sanity-io/example-sanity-smartling-proxy). If that's not useful, the important thing to pay attention to is that this endpoint handles requests with an `X-URL` header that contains the Smartling URL configured by the plugin, and can parse a data file to an HTML string and send it back to the adapter.
 
-3. Ensure the plugin has access to your Smartling project token. You'll want to create a document that includes your project name, organization name, and a token with appropriate access.
+3. Create or use a Smartling project token.
 
 [Please refer to the Smartling documentation on creating a token if you don't have one already.](https://help.smartling.com/hc/en-us/articles/115004187694-API-Tokens)
 
@@ -102,12 +102,12 @@ To use the default config mentioned above, we assume that you are following the 
 ### Field-level translations
 
 If you are using field-level translation, we assume any fields you want translated exist in the multi-locale object form we recommend.
-For example, on a document you don't want to be translated, you may have a "title" field that's a flat string: `title: 'My title is here.'` For a field you want to include many languages for, your title may look like
+For example, a non-localizable "title" field will be a flat string: `title: 'My title is here.'` For a field you want to include many languages for, your title may look like
 `    
 { 
   title: {
     en: 'My title is here.',
-    es: 'Mi título está aquí.',
+    es_ES: 'Mi título está aquí.',
     etc...
   }
 }
@@ -122,53 +122,6 @@ Since we often find users want to use the [Document internationalization plugin]
 
 It's okay if your data doesn't follow these patterns and you don't want to change them! You will simply have to override how the plugin gets and patches back information from your documents. Please see [Overriding defaults](#overriding-defaults).
 
-## Quickstart
-
-1. Install this plugin with `npm install sanity-plugin-studio-smartling`
-
-2. Ensure the plugin has access to your Smartling token secret. You'll want to create a document that includes your project name and a token secret with appropriate access. [Please refer to the Smartling documentation on creating a token if you don't have one already.](https://help.smartling.com/hc/en-us/articles/115004187694-API-Tokens-)
-   - In your studio, create a file called `populateSmartlingSecrets.js`.
-   - Place the following in the file and fill out the correct values.
-
-```javascript
-import sanityClient from 'part:@sanity/base/client'
-
-const client = sanityClient.withConfig({apiVersion: '2021-03-25'})
-
-client.createOrReplace({
-  _id: 'translationService.secrets',
-  _type: 'smartlingSettings',
-  organization: 'YOUR_ORG_HERE',
-  project: 'YOUR_PROJECT_HERE',
-  secret: '{"userIdentifier":"xxxxxx","userSecret":"xxxx"}' //in this format from Smartling
-})
-```
-
-- On the command line, run the file with `sanity exec populateSmartlingSecrets.js --with-user-token`.
-  Verify that everything went well by using Vision in the studio to query `*[_id == 'translationService.secrets']`. (NOTE: If you have multiple datasets, you'll have to do this across all of them, since it's a document!)
-- If everything looks good, go ahead and delete `populateSmartlingSecrets.js` so you don't commit it.
-  Because the document's `_id` is on a path (`translationService`), it won't be exposed to the outside world, even in a public dataset. If you have concerns about this being exposed to authenticated users of your studio, you can control access to this path with [role-based access control](https://www.sanity.io/docs/access-control).
-
-5.  Now it's time to get the Smartling tab on your desired document type, using whatever pattern you like. You'll use the [desk structure](https://www.sanity.io/docs/structure-builder-introduction) for this. The options for translation will be nested under this desired document type's views. Here's an example:
-
-```javascript
-import {DefaultDocumentNodeResolver} from 'sanity/desk'
-//...your other desk structure imports...
-import {TranslationsTab, defaultDocumentLevelConfig} from 'sanity-plugin-studio-smartling'
-
-export const getDefaultDocumentNode: DefaultDocumentNodeResolver = (S, {schemaType}) => {
-  if (schemaType === 'myTranslatableDocumentType') {
-    return S.document().views([
-      S.view.form(),
-      //...my other views -- for example, live preview, the i18n plugin, etc.,
-      S.view.component(TranslationsTab).title('Smartling').options(defaultDocumentLevelConfig)
-    ])
-  }
-  return S.document()
-}
-```
-
-And that should do it! Go into your studio, click around, and check the document in Smartling (it should be a job under its Sanity `_id`). Once it's translated, check the import by clicking the `Import` button on your Smartling tab!
 
 ## Assumptions
 
