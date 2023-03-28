@@ -81,7 +81,7 @@ import {DefaultDocumentNodeResolver} from 'sanity/desk'
 //...your other desk structure imports...
 import {TranslationsTab, defaultDocumentLevelConfig} from 'sanity-plugin-studio-smartling'
 
-export const getDefaultDocumentNode: DefaultDocumentNodeResolver = (S, {schemaType}) => {
+export const defaultDocumentNode: DefaultDocumentNodeResolver = (S, {schemaType}) => {
   if (schemaType === 'myTranslatableDocumentType') {
     return S.document().views([
       S.view.form(),
