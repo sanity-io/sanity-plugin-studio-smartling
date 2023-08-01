@@ -2,6 +2,7 @@ import {SerializedDocument} from 'sanity-naive-html-serializer'
 import {
   TranslationsTab,
   baseDocumentLevelConfig,
+  legacyDocumentLevelConfig as baseLegacyDocumentLevelConfig,
   baseFieldLevelConfig,
   findLatestDraft,
   BaseDocumentDeserializer,
@@ -10,6 +11,7 @@ import {
   defaultStopTypes,
   customSerializers,
   Adapter,
+  legacyDocumentLevelPatch,
   documentLevelPatch,
   fieldLevelPatch,
   TranslationFunctionContext,
@@ -35,6 +37,11 @@ const defaultDocumentLevelConfig: ConfigOptions = {
   adapter: SmartlingAdapter,
 }
 
+const legacyDocumentLevelConfig: ConfigOptions = {
+  ...baseLegacyDocumentLevelConfig,
+  adapter: SmartlingAdapter,
+}
+
 const defaultFieldLevelConfig: ConfigOptions = {
   ...baseFieldLevelConfig,
   adapter: SmartlingAdapter,
@@ -43,6 +50,7 @@ const defaultFieldLevelConfig: ConfigOptions = {
 export {
   TranslationsTab,
   findLatestDraft,
+  legacyDocumentLevelPatch,
   documentLevelPatch,
   fieldLevelPatch,
   BaseDocumentDeserializer,
@@ -51,6 +59,7 @@ export {
   defaultStopTypes,
   customSerializers,
   SmartlingAdapter,
+  legacyDocumentLevelConfig,
   defaultDocumentLevelConfig,
   defaultFieldLevelConfig,
 }

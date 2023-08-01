@@ -16,6 +16,8 @@ We're proud to be partnered with Smartling and their [official connector](https:
 
 This is a separate plugin, and differs in that it provides editors a visual progress bar for ongoing translations and a way to import translations back into your content at either the document or field level. Feel free to try it out and see which solution works for you!
 
+_Recent updates for v4:_ We've added support for the new document internationalization plugin pattern. Please read the [Document level translations](#document-level-translations) section for more information.
+
 # Table of Contents
 
 - [Quickstart](#quickstart)
@@ -80,6 +82,9 @@ If you have concerns about this being exposed to authenticated users of your stu
 import {DefaultDocumentNodeResolver} from 'sanity/desk'
 //...your other desk structure imports...
 import {TranslationsTab, defaultDocumentLevelConfig} from 'sanity-plugin-studio-smartling'
+//if you are using field-level translations, you can import the field-level config instead:
+//import {TranslationsTab, defaultFieldLevelConfig} from 'sanity-plugin-studio-smartling'
+//if you're not sure which, please look at the document-level and field-level sections below
 
 export const defaultDocumentNode: DefaultDocumentNodeResolver = (S, {schemaType}) => {
   if (schemaType === 'myTranslatableDocumentType') {
@@ -87,6 +92,8 @@ export const defaultDocumentNode: DefaultDocumentNodeResolver = (S, {schemaType}
       S.view.form(),
       //...my other views -- for example, live preview, document pane, etc.,
       S.view.component(TranslationsTab).title('Smartling').options(defaultDocumentLevelConfig)
+      //again, if you're using field-level translations, you can use the field-level config instead:
+      //S.view.component(TranslationsTab).title('Smartling').options(defaultFieldLevelConfig)
     ])
   }
   return S.document()
@@ -101,7 +108,7 @@ To use the default config mentioned above, we assume that you are following the 
 
 ### Field-level translations
 
-If you are using field-level translation, we assume any fields you want translated exist in the multi-locale object form we recommend.
+If you are using field-level translation and the `defaultFieldLevelConfig` configuration, we assume any fields you want translated exist in the multi-locale object form we recommend.
 For example, a non-localizable "title" field will be a flat string: `title: 'My title is here.'` For a field you want to include many languages for, your title may look like
 `    
 { 
@@ -116,37 +123,10 @@ _Important_: Smartling's locale representation includes hyphens, like `fr-FR`. T
 
 ### Document level translations
 
-Since we often find users want to use the [Document internationalization plugin](https://www.sanity.io/plugins/document-internationalization) if they're using document-level translations, we assume that any documents you want in different languages will follow the pattern `{id-of-base-language-document}__i18n_{locale}`
+Since we often find users want to use the [Document internationalization plugin](https://www.sanity.io/plugins/document-internationalization) if they're using document-level translations, we assume that any documents you want in different languages will be present in a `translation.metadata` document.
 
-### Final note
+_Important_: The above is true if you are using the Document Internationalization Plugin at version 2 or above. If you are using version 1 please use the `legacyDocumentLevelConfig` configuration exported from this plugin. This configuration assumes your translations follow the pattern `{id-of-base-language-document}__i18n_{locale}`
 
-It's okay if your data doesn't follow these patterns and you don't want to change them! You will simply have to override how the plugin gets and patches back information from your documents. Please see [Overriding defaults](#overriding-defaults).
-
-
-## Assumptions
-
-To use the default config mentioned above, we assume that you are following the conventions we outline in [our documentation on localization](https://www.sanity.io/docs/localization).
-
-### Field-level translations
-
-If you are using field-level translation, we assume any fields you want to be translated exist in the multi-locale object form we recommend.
-
-For example, on a document you don't want to be translated, you may have a "title" field that's a flat string: `title: 'My title is here.'` For a field you want to include many languages for your title may look like:
-
-```javascript
-{
-  //...other document fields,
-  title: {
-    en: 'My title is here.',
-    es: 'Mi título está aquí.',
-    etc...
-  }
-}
-```
-
-### Document level translations
-
-Since we often find users want to use the [Document internationalization plugin](https://www.sanity.io/plugins/document-internationalization) if they're using document-level translations, we assume that any documents you want in different languages will follow the pattern `{id-of-base-language-document}__i18n_{locale}`
 
 ### Final note
 
