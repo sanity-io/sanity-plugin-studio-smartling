@@ -23,13 +23,13 @@ interface ConfigOptions {
   secretsNamespace: string | null
   exportForTranslation: (
     id: string,
-    context: TranslationFunctionContext
+    context: TranslationFunctionContext,
   ) => Promise<SerializedDocument>
   importTranslation: (
     id: string,
     localeId: string,
     doc: string,
-    context: TranslationFunctionContext
+    context: TranslationFunctionContext,
   ) => Promise<void>
 }
 const defaultDocumentLevelConfig: ConfigOptions = {

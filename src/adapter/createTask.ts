@@ -3,11 +3,17 @@ import {Adapter, Secrets} from 'sanity-translations-tab'
 import {getTranslationTask} from './getTranslationTask'
 import {Buffer} from 'buffer'
 
-const createJob = (jobName: string, secrets: Secrets, localeIds: string[], accessToken: string) => {
+const createJob = (
+  jobName: string,
+  secrets: Secrets,
+  localeIds: string[],
+  accessToken: string,
+  documentId: string,
+) => {
   const {project, proxy} = secrets
   if (!project || !proxy) {
     throw new Error(
-      'The Smartling adapter requires a Smartling project identifier and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.'
+      'The Smartling adapter requires a Smartling project identifier and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.',
     )
   }
 
@@ -21,6 +27,7 @@ const createJob = (jobName: string, secrets: Secrets, localeIds: string[], acces
     body: JSON.stringify({
       jobName,
       targetLocaleIds: localeIds,
+      referenceNumber: documentId,
     }),
   })
     .then((res) => res.json())
@@ -36,16 +43,16 @@ const createJob = (jobName: string, secrets: Secrets, localeIds: string[], acces
 const createJobBatch = (
   jobId: string,
   secrets: Secrets,
-  documentName: string,
+  documentId: string,
   accessToken: string,
   localeIds: string[],
-  workflowUid?: string
+  workflowUid?: string,
   //eslint-disable-next-line max-params
 ) => {
   const {project, proxy} = secrets
   if (!project || !proxy) {
     throw new Error(
-      'The Smartling adapter requires a Smartling project identifier and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.'
+      'The Smartling adapter requires a Smartling project identifier and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.',
     )
   }
   const url = `https://api.smartling.com/job-batches-api/v2/projects/${project}/batches`
@@ -57,7 +64,7 @@ const createJobBatch = (
   } = {
     authorize: true,
     translationJobUid: jobId,
-    fileUris: [documentName],
+    fileUris: [documentId],
   }
 
   if (workflowUid) {
@@ -81,20 +88,22 @@ const createJobBatch = (
 
 const uploadFileToBatch = (
   batchUid: string,
+  documentId: string,
   document: Record<string, any>,
   secrets: Secrets,
   localeIds: string[],
-  accessToken: string
+  accessToken: string,
+  //eslint-disable-next-line max-params
 ) => {
   const {project, proxy} = secrets
   if (!project || !proxy) {
     throw new Error(
-      'The Smartling adapter requires a Smartling project identifier and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.'
+      'The Smartling adapter requires a Smartling project identifier and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.',
     )
   }
   const url = `https://api.smartling.com/job-batches-api/v2/projects/${project}/batches/${batchUid}/file`
   const formData = new FormData()
-  formData.append('fileUri', document.name)
+  formData.append('fileUri', documentId)
   formData.append('fileType', 'html')
   const htmlBuffer = Buffer.from(document.content, 'utf-8')
   formData.append('file', new Blob([htmlBuffer]), `${document.name}.html`)
@@ -112,11 +121,11 @@ export const createTask: Adapter['createTask'] = async (
   document: Record<string, any>,
   localeIds: string[],
   secrets: Secrets | null,
-  workflowUid?: string
+  workflowUid?: string,
 ) => {
   if (!secrets?.project || !secrets?.secret || !secrets?.proxy) {
     throw new Error(
-      'The Smartling adapter requires a project ID, a secret key, and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.'
+      'The Smartling adapter requires a project ID, a secret key, and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.',
     )
   }
 
@@ -124,18 +133,25 @@ export const createTask: Adapter['createTask'] = async (
 
   let taskId = await findExistingJob(document.name, secrets, accessToken)
   if (!taskId) {
-    taskId = await createJob(document.name, secrets, localeIds, accessToken)
+    taskId = await createJob(document.name, secrets, localeIds, accessToken, documentId)
   }
 
   const batchUid = await createJobBatch(
     taskId,
     secrets,
-    document.name,
+    documentId,
     accessToken,
     localeIds,
-    workflowUid
+    workflowUid,
   )
-  const uploadFileRes = await uploadFileToBatch(batchUid, document, secrets, localeIds, accessToken)
+  const uploadFileRes = await uploadFileToBatch(
+    batchUid,
+    documentId,
+    document,
+    secrets,
+    localeIds,
+    accessToken,
+  )
   //eslint-disable-next-line no-console -- for developer debugging
   console.info('Upload status from Smartling: ', uploadFileRes)
 
