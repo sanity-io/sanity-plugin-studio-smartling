@@ -4,11 +4,11 @@ import {Adapter, Secrets} from 'sanity-translations-tab'
 export const getTranslation: Adapter['getTranslation'] = async (
   taskId: string,
   localeId: string,
-  secrets: Secrets | null
+  secrets: Secrets | null,
 ) => {
   if (!secrets?.project || !secrets?.secret || !secrets?.proxy) {
     throw new Error(
-      'The Smartling adapter requires a project ID, a secret key, and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.'
+      'The Smartling adapter requires a project ID, a secret key, and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.',
     )
   }
 

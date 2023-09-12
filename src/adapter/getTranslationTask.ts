@@ -18,7 +18,7 @@ interface SmartlingProgressItem {
 
 export const getTranslationTask: Adapter['getTranslationTask'] = async (
   documentId: string,
-  secrets: Secrets | null
+  secrets: Secrets | null,
 ) => {
   if (!secrets?.project || !secrets?.secret || !secrets?.proxy) {
     return {
