@@ -68,7 +68,9 @@ export const findExistingJob = async (
 
   if (items.length) {
     //smartling will fuzzy match job names. We need to be precise.
-    const correctJob = items.find(
+    const correctJob = items
+      .filter((item: {jobStatus: string}) => item.jobStatus !== 'DELETED')
+      .find(
       (item: {jobName: string; referenceNumber: string}) =>
         (item.jobName && item.jobName === documentId) ||
         (item.referenceNumber && item.referenceNumber === documentId),
