@@ -29,7 +29,7 @@ const customConfig = {
         return {
           _type: 'testObject',
           _key: node.id,
-          title: node.textContent
+          title: node.innerHTML
         }
       }
     },
@@ -57,4 +57,12 @@ const customConfig = {
   }
   //adapter, baseLanguage, secretsNamespace, importTranslation, exportForTranslation should likely not be touched unless you very much want to customize your plugin.
 } satisfies TranslationsTabConfigOptions
+
+
+const defaultDocumentNode: DefaultDocumentNodeResolver = (S) => {
+  return S.document().views([
+    S.view.form(),
+    S.view.component(TranslationsTab).title('Smartling').options(customConfig)
+  ])
+}
 ```
