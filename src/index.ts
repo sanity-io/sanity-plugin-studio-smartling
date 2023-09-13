@@ -1,4 +1,3 @@
-import {SerializedDocument} from 'sanity-naive-html-serializer'
 import {
   TranslationsTab,
   baseDocumentLevelConfig,
@@ -10,39 +9,25 @@ import {
   BaseDocumentMerger,
   defaultStopTypes,
   customSerializers,
-  Adapter,
   legacyDocumentLevelPatch,
   documentLevelPatch,
   fieldLevelPatch,
   TranslationFunctionContext,
+  TranslationsTabConfigOptions,
 } from 'sanity-translations-tab'
 import {SmartlingAdapter} from './adapter'
 
-interface ConfigOptions {
-  adapter: Adapter
-  secretsNamespace: string | null
-  exportForTranslation: (
-    id: string,
-    context: TranslationFunctionContext,
-  ) => Promise<SerializedDocument>
-  importTranslation: (
-    id: string,
-    localeId: string,
-    doc: string,
-    context: TranslationFunctionContext,
-  ) => Promise<void>
-}
-const defaultDocumentLevelConfig: ConfigOptions = {
+const defaultDocumentLevelConfig: TranslationsTabConfigOptions = {
   ...baseDocumentLevelConfig,
   adapter: SmartlingAdapter,
 }
 
-const legacyDocumentLevelConfig: ConfigOptions = {
+const legacyDocumentLevelConfig: TranslationsTabConfigOptions = {
   ...baseLegacyDocumentLevelConfig,
   adapter: SmartlingAdapter,
 }
 
-const defaultFieldLevelConfig: ConfigOptions = {
+const defaultFieldLevelConfig: TranslationsTabConfigOptions = {
   ...baseFieldLevelConfig,
   adapter: SmartlingAdapter,
 }
@@ -63,3 +48,5 @@ export {
   defaultDocumentLevelConfig,
   defaultFieldLevelConfig,
 }
+
+export type {TranslationFunctionContext, TranslationsTabConfigOptions}

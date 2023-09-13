@@ -71,10 +71,10 @@ export const findExistingJob = async (
     const correctJob = items
       .filter((item: {jobStatus: string}) => item.jobStatus !== 'DELETED')
       .find(
-      (item: {jobName: string; referenceNumber: string}) =>
-        (item.jobName && item.jobName === documentId) ||
-        (item.referenceNumber && item.referenceNumber === documentId),
-    )
+        (item: {jobName: string; referenceNumber: string}) =>
+          (item.jobName && item.jobName === documentId) ||
+          (item.referenceNumber && item.referenceNumber === documentId),
+      )
 
     if (correctJob) {
       return correctJob.translationJobUid
