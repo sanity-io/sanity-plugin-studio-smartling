@@ -1,5 +1,5 @@
 import {authenticate, getHeaders, findExistingJob} from './helpers'
-import {Adapter, Secrets} from 'sanity-translations-tab'
+import {Adapter, Secrets, CustomParams} from 'sanity-translations-tab'
 import {getTranslationTask} from './getTranslationTask'
 import {Buffer} from 'buffer'
 
@@ -93,7 +93,7 @@ const uploadFileToBatch = (
   secrets: Secrets,
   localeIds: string[],
   accessToken: string,
-  customParams?: {callbackUrl: string},
+  customParams?: CustomParams,
   //eslint-disable-next-line max-params
 ) => {
   const {project, proxy} = secrets
@@ -127,7 +127,7 @@ export const createTask: Adapter['createTask'] = async (
   localeIds: string[],
   secrets: Secrets | null,
   workflowUid?: string,
-  customParams?: {callbackUrl: string},
+  customParams?: CustomParams,
   // eslint-disable-next-line max-params
 ) => {
   if (!secrets?.project || !secrets?.secret || !secrets?.proxy) {
