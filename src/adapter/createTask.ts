@@ -93,6 +93,7 @@ const uploadFileToBatch = (
   secrets: Secrets,
   localeIds: string[],
   accessToken: string,
+  customParams?: {callbackUrl: string},
   //eslint-disable-next-line max-params
 ) => {
   const {project, proxy} = secrets
@@ -109,6 +110,10 @@ const uploadFileToBatch = (
   formData.append('file', new Blob([htmlBuffer]), `${document.name}.html`)
   localeIds.forEach((localeId) => formData.append('localeIdsToAuthorize[]', localeId))
 
+  if (customParams?.callbackUrl) {
+    formData.append('callbackUrl', customParams?.callbackUrl)
+  }
+
   return fetch(proxy, {
     method: 'POST',
     headers: getHeaders(url, accessToken),
@@ -122,6 +127,8 @@ export const createTask: Adapter['createTask'] = async (
   localeIds: string[],
   secrets: Secrets | null,
   workflowUid?: string,
+  customParams?: {callbackUrl: string},
+  // eslint-disable-next-line max-params
 ) => {
   if (!secrets?.project || !secrets?.secret || !secrets?.proxy) {
     throw new Error(
@@ -151,6 +158,7 @@ export const createTask: Adapter['createTask'] = async (
     secrets,
     localeIds,
     accessToken,
+    customParams,
   )
   //eslint-disable-next-line no-console -- for developer debugging
   console.info('Upload status from Smartling: ', uploadFileRes)
