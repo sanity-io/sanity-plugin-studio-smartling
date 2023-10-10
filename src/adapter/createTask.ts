@@ -110,8 +110,8 @@ const uploadFileToBatch = (
   formData.append('file', new Blob([htmlBuffer]), `${document.name}.html`)
   localeIds.forEach((localeId) => formData.append('localeIdsToAuthorize[]', localeId))
 
-  if (customParams?.callbackUrl) {
-    formData.append('callbackUrl', customParams?.callbackUrl)
+  if (customParams?.callbackUrl && typeof customParams?.callbackUrl === 'function') {
+    formData.append('callbackUrl', customParams?.callbackUrl(document))
   }
 
   return fetch(proxy, {
