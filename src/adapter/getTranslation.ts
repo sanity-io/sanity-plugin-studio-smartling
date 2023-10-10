@@ -14,7 +14,7 @@ export const getTranslation: Adapter['getTranslation'] = async (
 
   const {project, proxy} = secrets
 
-  const url = `https://api.smartling.com/files-api/v2/projects/${project}/locales/${localeId}/file?fileUri=${taskId}&retrievalType=pending`
+  const url = `https://api.smartling.com/files-api/v2/projects/${project}/locales/${localeId}/file?fileUri=${localeId}_${taskId}&retrievalType=pending`
   const accessToken = await authenticate(secrets)
   const translatedHTML = await fetch(proxy, {
     method: 'GET',
