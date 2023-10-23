@@ -41,7 +41,7 @@ export const findExistingJob = async (
       'The Smartling adapter requires a Smartling project identifier and a proxy URL. Please check your secrets document in this dataset, per the plugin documentation.',
     )
   }
-  const url = `https://api.smartling.com/jobs-api/v3/projects/${project}/jobs`
+  const url = `https://api.smartling.com/jobs-api/v3/projects/${project}/jobs?jobName=${documentId}`
   //first, try fetching from name resolution
   let items = await fetch(proxy, {
     headers: getHeaders(url, accessToken),

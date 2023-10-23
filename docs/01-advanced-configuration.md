@@ -55,13 +55,9 @@ const customConfig = {
       },
     ]
   },
-
-  // add custom params for Smartling
-  customParams: {
-    // GET request that creates a callback to a URL when a file is 100% published for a locale. 
-    //  The callback gives the fileUri and locale with the format http[/s]://your.url?locale=xx-XX&fileUri=your.file. 
-    callbackUrl: 'https://your-endpoint.here'
-  }
+  // GET request that creates a callback to a URL when a file is 100% published for a locale. 
+  //  The callback gives the fileUri and locale with the format http[/s]://your.url?locale=xx-XX&fileUri=your.file. 
+  callbackUrl: 'https://your-endpoint.here'
   //adapter, baseLanguage, secretsNamespace, importTranslation, exportForTranslation should likely not be touched unless you very much want to customize your plugin.
 } satisfies TranslationsTabConfigOptions
 
