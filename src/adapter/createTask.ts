@@ -1,5 +1,5 @@
 import {authenticate, getHeaders, findExistingJob} from './helpers'
-import {Adapter, Secrets} from 'sanity-translations-tab'
+import {Adapter, Secrets, SerializedDocument} from 'sanity-translations-tab'
 import {getTranslationTask} from './getTranslationTask'
 import {Buffer} from 'buffer'
 
@@ -89,10 +89,11 @@ const createJobBatch = (
 const uploadFileToBatch = (
   batchUid: string,
   documentId: string,
-  document: Record<string, any>,
+  document: SerializedDocument,
   secrets: Secrets,
   localeIds: string[],
   accessToken: string,
+  callbackUrl?: string,
   //eslint-disable-next-line max-params
 ) => {
   const {project, proxy} = secrets
@@ -108,6 +109,9 @@ const uploadFileToBatch = (
   const htmlBuffer = Buffer.from(document.content, 'utf-8')
   formData.append('file', new Blob([htmlBuffer]), `${document.name}.html`)
   localeIds.forEach((localeId) => formData.append('localeIdsToAuthorize[]', localeId))
+  if (callbackUrl) {
+    formData.append('callbackUrl', callbackUrl)
+  }
 
   return fetch(proxy, {
     method: 'POST',
@@ -118,10 +122,12 @@ const uploadFileToBatch = (
 
 export const createTask: Adapter['createTask'] = async (
   documentId: string,
-  document: Record<string, any>,
+  document: SerializedDocument,
   localeIds: string[],
   secrets: Secrets | null,
   workflowUid?: string,
+  callbackUrl?: string,
+  // eslint-disable-next-line max-params
 ) => {
   if (!secrets?.project || !secrets?.secret || !secrets?.proxy) {
     throw new Error(
@@ -151,6 +157,7 @@ export const createTask: Adapter['createTask'] = async (
     secrets,
     localeIds,
     accessToken,
+    callbackUrl,
   )
   //eslint-disable-next-line no-console -- for developer debugging
   console.info('Upload status from Smartling: ', uploadFileRes)
