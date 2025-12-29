@@ -5,6 +5,12 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.3.2](https://github.com/sanity-io/sanity-plugin-studio-smartling/compare/v4.3.1...v4.3.2) (2025-12-29)
+
+### Bug Fixes
+
+- update package.json and package-lock.json to support Sanity v5 ([#34](https://github.com/sanity-io/sanity-plugin-studio-smartling/issues/34)) ([9a8eb09](https://github.com/sanity-io/sanity-plugin-studio-smartling/commit/9a8eb0978b27c4b7c848835645e5c8d99d3d07c3))
+
 ## [4.3.1](https://github.com/sanity-io/sanity-plugin-studio-smartling/compare/v4.3.0...v4.3.1) (2025-07-10)
 
 ### Bug Fixes
